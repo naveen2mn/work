@@ -1,1 +1,338 @@
-finalModel = '[{"Table":"MarketingAuthorisationHolder","Columns":[{"Name":"Id","DataType":"Int","Changes":[{"ChangeType":"DataType","OldValue":"Int","NewValue":"bigint"},{"ChangeType":"ColumnName","OldValue":"Id","NewValue":"OrganizationId1"}]},{"Name":"OrganizationId","DataType":"bigint","Changes":[{"ChangeType":"ColumnName","OldValue":"OrganizationId","NewValue":"OrganizationId1"}]}]}]';
+
+@{
+ViewBag.Title = "Index";
+}
+<style>
+    .form-control-feedback {
+        cursor:pointer;
+        pointer-events:visible;
+    }
+   .table-list {
+            overflow-x: hidden;
+            overflow-y: auto;
+            height: 600px;
+        }
+        .mod{
+            background: #d5bb63;
+        }
+        select {
+            /* for Firefox */
+            -moz-appearance: none;
+            /* for Chrome */
+            -webkit-appearance: none;
+            border:0;
+            padding: 2px 4px;
+            width:100%;
+        }
+
+        /* For IE10 */
+        select::-ms-expand {
+            display: none;
+        }
+        input{
+            width: 90%;
+            margin-right: 20px;
+        }
+    .content-title {
+    font-size: 16px;
+    color: white;
+    background: #003a5f;
+    padding: 4px 8px;
+    margin-bottom: 10px;
+        min-height: 30px;
+
+    }
+    .modal-dialog {
+             margin: 30% auto;
+    }
+
+</style>
+<div class="wrapper">
+    <div class="inner-box">
+        <div class="inner-box-header">Custom Data Model
+            <div class="btn-sm btn-success pull-right" id="save_btn">Save</div>
+        </div>
+        <div class="inner-box-body">
+            <div class="row">
+                <div class="col-md-4 col-sm-4 col-xs-12">
+                    <div class="content-title">Tables</div>
+                    <div class="list-group table-list" id="table_list">
+                        There is no content to display
+                    </div>
+                </div>
+                <div class="col-md-8 col-sm-8 col-xs-12">
+                    <div class="content-title">Column <span class="glyphicon glyphicon-plus pull-right" id="addColumn"></span></div>
+                    <div style="padding: 0 0px 8px;">Table Name : <span id="table_name"></span></div>
+                    <div id="add_column"></div>
+                    <div class="col-list" id="column_list">
+                        Please select table
+                    </div>
+                    
+                </div>
+            </div>
+            <div class="modal fade" id="myModal" role="dialog">
+                <div class="modal-dialog modal-sm">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <h4 class="modal-title">Delete?</h4>
+                        </div>
+                        <div class="modal-body" style="text-align:center;">            
+                            <p>Are You want to remove this Column?</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn-danger"  data-dismiss="modal" id="confirmDelete">Yes</button>
+                            <button type="button" class="btn-warning" data-dismiss="modal">No</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+@*@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}*@
+<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+
+<script>
+    //(function () {
+        var tableList = [];
+        var dataTypes = [];
+            //data1 = {"MarketingAuthorisationApplication":[{"Name":"Id","DataType":"bigint","change":false},{"Name":"MarketingAuthorisationProcedureId","DataType":"bigint","change":false},{"Name":"Number","DataType":"nvarchar","change":false},{"Name":"Type","DataType":"nvarchar","change":false},{"Name":"Date","DataType":"datetime","change":false},{"Name":"FirstAuthorizationDate","DataType":"datetime","change":false},{"Name":"VersionNo","DataType":"decimal","change":false}],"MarketingAuthorisationHolder":[{"Name":"Id","DataType":"bigint","change":false},{"Name":"OrganizationId","DataType":"bigint","change":false},{"Name":"MarketingAuthorisationId","DataType":"bigint","change":false},{"Name":"Filename","DataType":"varchar","change":false},{"Name":"VersionNo","DataType":"decimal","change":false}],"DevelopmentSubstances_XEVMPD":[{"Name":"CasNumber","DataType":"int","change":false},{"Name":"Id","DataType":"int","change":false},{"Name":"XEVMPDId","DataType":"int","change":false},{"Name":"CreatedOn","DataType":"datetime","change":false},{"Name":"NewOwnerId","DataType":"int","change":false},{"Name":"SponserCode","DataType":"int","change":false},{"Name":"ResolutionMode","DataType":"varchar","change":false},{"Name":"CreatedBy","DataType":"varchar","change":false},{"Name":"UpdatedOn","DataType":"datetime","change":false},{"Name":"UpdatedBy","DataType":"varchar","change":false},{"Name":"DevSubstance","DataType":"varchar","change":false},{"Name":"OperationType","DataType":"varchar","change":false},{"Name":"Virtual","DataType":"varchar","change":false},{"Name":"LocalNumber","DataType":"varchar","change":false},{"Name":"Evcode","DataType":"varchar","change":false},{"Name":"MolecularFormula","DataType":"varchar","change":false},{"Name":"SubstanceClass","DataType":"varchar","change":false},{"Name":"CBD","DataType":"varchar","change":false},{"Name":"DevSubstanceName","DataType":"varchar","change":false},{"Name":"InternationalCode","DataType":"varchar","change":false},{"Name":"SubstanceAttachments","DataType":"varchar","change":false},{"Name":"SubstanceSSIS","DataType":"varchar","change":false},{"Name":"Comments","DataType":"varchar","change":false}],"MarketingAuthorisationProcedure":[{"Name":"Id","DataType":"bigint","change":false},{"Name":"MarketingAuthorisationId","DataType":"bigint","change":false},{"Name":"IdentifierNumber","DataType":"nvarchar","change":false},{"Name":"Type","DataType":"nvarchar","change":false},{"Name":"Date","DataType":"datetime","change":false},{"Name":"Filename","DataType":"varchar","change":false},{"Name":"VersionNo","DataType":"decimal","change":false}],"MarketingStatus":[{"Name":"Id","DataType":"bigint","change":false},{"Name":"MarketingAuthorisationId","DataType":"bigint","change":false},{"Name":"Country","DataType":"nvarchar","change":false},{"Name":"Jurisdiction","DataType":"nvarchar","change":false},{"Name":"JurisdictionMAnumber","DataType":"nvarchar","change":false},{"Name":"Date","DataType":"datetime","change":false},{"Name":"JurisdictionLegalStatus","DataType":"nvarchar","change":false},{"Name":"Filename","DataType":"varchar","change":false},{"Name":"VersionNo","DataType":"decimal","change":false}],"MASME":[{"Name":"Id","DataType":"bigint","change":false},{"Name":"MarketingAuthorisationId","DataType":"bigint","change":false},{"Name":"Size","DataType":"nvarchar","change":false},{"Name":"Flag","DataType":"nvarchar","change":false},{"Name":"Number","DataType":"nvarchar","change":false},{"Name":"Date","DataType":"datetime","change":false},{"Name":"VersionNo","DataType":"decimal","change":false}],"ApprovedSubstances_XEVMPD":[{"Name":"Id","DataType":"int","change":false},{"Name":"SourceCode","DataType":"int","change":false},{"Name":"LanguageCode","DataType":"int","change":false},{"Name":"XEVMPDId","DataType":"int","change":false},{"Name":"CreatedOn","DataType":"datetime","change":false},{"Name":"CreatedBy","DataType":"varchar","change":false},{"Name":"UpdatedOn","DataType":"datetime","change":false},{"Name":"UpdatedBy","DataType":"varchar","change":false},{"Name":"Term","DataType":"varchar","change":false},{"Name":"SubstanceAlias","DataType":"varchar","change":false},{"Name":"AliasName","DataType":"varchar","change":false},{"Name":"ResolutionModeAlias","DataType":"varchar","change":false},{"Name":"AliasTranslation","DataType":"varchar","change":false},{"Name":"LanguageCodeAlias","DataType":"varchar","change":false},{"Name":"TermAlias","DataType":"varchar","change":false},{"Name":"InternationalCode","DataType":"varchar","change":false},{"Name":"Previoussevcode","DataType":"varchar","change":false},{"Name":"SubstanceSSIS","DataType":"varchar","change":false},{"Name":"SubstanceAttachments","DataType":"varchar","change":false},{"Name":"Comment","DataType":"varchar","change":false},{"Name":"ResolutionMode","DataType":"varchar","change":false},{"Name":"SubstanceName","DataType":"varchar","change":false},{"Name":"CBD","DataType":"varchar","change":false},{"Name":"SubstanceTranslation","DataType":"varchar","change":false},{"Name":"OperationType","DataType":"varchar","change":false},{"Name":"ApprovedSubstance","DataType":"varchar","change":false},{"Name":"Virtual","DataType":"varchar","change":false},{"Name":"LocalNumber","DataType":"varchar","change":false},{"Name":"Evcode","DataType":"varchar","change":false}],"MasterFile":[{"Name":"id","DataType":"int","change":false},{"Name":"Code","DataType":"nvarchar","change":false},{"Name":"Filename","DataType":"varchar","change":false},{"Name":"VersionNo","DataType":"decimal","change":false},{"Name":"Location","DataType":"nvarchar","change":false}],"MedicinalProduct":[{"Name":"id","DataType":"bigint","change":false},{"Name":"CreatedOn","DataType":"datetime","change":false},{"Name":"CreatedBy","DataType":"varchar","change":false},{"Name":"LastUpdatedOn","DataType":"datetime","change":false},{"Name":"LastUpdatedBy","DataType":"varbinary","change":false},{"Name":"VersionNo","DataType":"decimal","change":false},{"Name":"MF_ID","DataType":"int","change":false},{"Name":"MP_ID","DataType":"nvarchar","change":false},{"Name":"DoseForm","DataType":"nvarchar","change":false},{"Name":"AdditionalIndicator","DataType":"nvarchar","change":false},{"Name":"SpecialMeasures","DataType":"nvarchar","change":false},{"Name":"OrphanStatus","DataType":"nvarchar","change":false},{"Name":"Filename","DataType":"varchar","change":false},{"Name":"IMPIDCrossReference","DataType":"nvarchar","change":false}],"MedicinalProductClassification":[{"Name":"Id","DataType":"bigint","change":false},{"Name":"MedicinalProductId","DataType":"bigint","change":false},{"Name":"System","DataType":"nvarchar","change":false},{"Name":"ATCCode","DataType":"nvarchar","change":false},{"Name":"Filename","DataType":"varchar","change":false},{"Name":"VersionNo","DataType":"decimal","change":false}],"MedicinesRegulatoryAgency":[{"Name":"Id","DataType":"bigint","change":false},{"Name":"OrganizationId","DataType":"bigint","change":false},{"Name":"marketingAuthorisationId","DataType":"bigint","change":false},{"Name":"ManufacturingOperationId","DataType":"bigint","change":false},{"Name":"VersionNo","DataType":"decimal","change":false}],"ExtractReadyVersions":[{"Name":"Id","DataType":"int","change":false},{"Name":"FileId","DataType":"int","change":false},{"Name":"Version","DataType":"decimal","change":false},{"Name":"CreatedOn","DataType":"datetime","change":false},{"Name":"CreatedBy","DataType":"nvarchar","change":false},{"Name":"Data","DataType":"nvarchar","change":false}],"OtherLocation":[{"Name":"Id","DataType":"bigint","change":false},{"Name":"OrganizationId","DataType":"bigint","change":false},{"Name":"Identifier","DataType":"nvarchar","change":false},{"Name":"LocationRole","DataType":"nvarchar","change":false},{"Name":"Address","DataType":"nvarchar","change":false},{"Name":"VersionNo","DataType":"decimal","change":false}],"OtherTherapySpecifics":[{"Name":"Id","DataType":"bigint","change":false},{"Name":"ContraIndicationId","DataType":"bigint","change":false},{"Name":"TherapeuticIndicationId","DataType":"bigint","change":false},{"Name":"RelationshipType","DataType":"nvarchar","change":false},{"Name":"Medication","DataType":"nvarchar","change":false},{"Name":"VersionNo","DataType":"decimal","change":false}],"PackageComponent":[{"Name":"Id","DataType":"bigint","change":false},{"Name":"PackagedItemId","DataType":"bigint","change":false},{"Name":"Type","DataType":"nvarchar","change":false},{"Name":"Material","DataType":"nvarchar","change":false},{"Name":"AlternateMaterial","DataType":"nvarchar","change":false},{"Name":"VersionNo","DataType":"decimal","change":false}],"Attachments_XEVMPD":[{"Name":"Id","DataType":"int","change":false},{"Name":"XEVMPDId","DataType":"int","change":false},{"Name":"CreatedOn","DataType":"datetime","change":false},{"Name":"CreatedBy","DataType":"varchar","change":false},{"Name":"UpdatedOn","DataType":"datetime","change":false},{"Name":"UpdatedBy","DataType":"varchar","change":false},{"Name":"Attachment","DataType":"varchar","change":false},{"Name":"OperationType","DataType":"varchar","change":false},{"Name":"LocalNumber","DataType":"varchar","change":false},{"Name":"FileName","DataType":"varchar","change":false},{"Name":"FileType","DataType":"varchar","change":false},{"Name":"AttachmentName","DataType":"varchar","change":false},{"Name":"AttachmentType","DataType":"varchar","change":false},{"Name":"LanguageCode","DataType":"varchar","change":false},{"Name":"AttachmentVersion","DataType":"varchar","change":false},{"Name":"AttachmentVersionDate","DataType":"datetime","change":false},{"Name":"AttachmentVersionDateFormat","DataType":"varchar","change":false}],"PackagedMedicinalProduct":[{"Name":"Id","DataType":"bigint","change":false},{"Name":"MedicinalProductId","DataType":"bigint","change":false},{"Name":"marketingAuthorisationId","DataType":"bigint","change":false},{"Name":"PCID","DataType":"nvarchar","change":false},{"Name":"Description","DataType":"nvarchar","change":false},{"Name":"Filename","DataType":"varchar","change":false},{"Name":"VersionNo","DataType":"decimal","change":false}],"MessageHeader_XEVMPD":[{"Name":"Id","DataType":"int","change":false},{"Name":"Number","DataType":"bigint","change":false},{"Name":"XEVMPDId","DataType":"int","change":false},{"Name":"CreatedOn","DataType":"datetime","change":false},{"Name":"CreatedBy","DataType":"varchar","change":false},{"Name":"UpdatedOn","DataType":"datetime","change":false},{"Name":"UpdatedBy","DataType":"varchar","change":false},{"Name":"SenderIdentifier","DataType":"varchar","change":false},{"Name":"ReceiverIdentifier","DataType":"varchar","change":false},{"Name":"Date","DataType":"datetime","change":false},{"Name":"DateFormat","DataType":"varchar","change":false},{"Name":"Type","DataType":"varchar","change":false},{"Name":"FormatVersion","DataType":"varchar","change":false},{"Name":"FormatRelease","DataType":"varchar","change":false}],"PharmaceuticalProduct":[{"Name":"Id","DataType":"bigint","change":false},{"Name":"MedicinalProductId","DataType":"bigint","change":false},{"Name":"AdministrableDoseForm","DataType":"nvarchar","change":false},{"Name":"Php_ID","DataType":"nvarchar","change":false},{"Name":"PresentationUnit","DataType":"nvarchar","change":false},{"Name":"Quantity","DataType":"tinyint","change":false},{"Name":"Filename","DataType":"varchar","change":false},{"Name":"VersionNo","DataType":"decimal","change":false}],"CodeMasters":[{"Name":"Id","DataType":"int","change":false},{"Name":"Name","DataType":"nvarchar","change":false}],"DataSource":[{"Name":"Id","DataType":"int","change":false},{"Name":"Name","DataType":"nvarchar","change":false},{"Name":"Type","DataType":"nvarchar","change":false},{"Name":"ConnectionString","DataType":"nvarchar","change":false},{"Name":"IsActive","DataType":"bit","change":false},{"Name":"CreatedOn","DataType":"datetime","change":false},{"Name":"CreatedBy","DataType":"nvarchar","change":false},{"Name":"LastUpdatedOn","DataType":"datetime","change":false},{"Name":"LastUpdatedBy","DataType":"nvarchar","change":false}],"PharmaceuticalProductCharacteristics":[{"Name":"Id","DataType":"bigint","change":false},{"Name":"PharmaceuticalProductId","DataType":"bigint","change":false},{"Name":"Code","DataType":"nvarchar","change":false},{"Name":"Value","DataType":"nvarchar","change":false},{"Name":"VersionNo","DataType":"decimal","change":false}],"PHPIDSet":[{"Name":"Id","DataType":"bigint","change":false},{"Name":"PharmaceuticalProductId","DataType":"bigint","change":false},{"Name":"IdentifierSet","DataType":"nvarchar","change":false},{"Name":"VersionNo","DataType":"decimal","change":false}],"PhysicalCharacteristics":[{"Name":"Id","DataType":"bigint","change":false},{"Name":"DeviceId","DataType":"bigint","change":false},{"Name":"PackageComponentId","DataType":"bigint","change":false},{"Name":"ManufacturedItemId","DataType":"bigint","change":false},{"Name":"PackagedItemId","DataType":"bigint","change":false},{"Name":"Height","DataType":"nvarchar","change":false},{"Name":"HeightUOM","DataType":"nvarchar","change":false},{"Name":"Width","DataType":"nvarchar","change":false},{"Name":"WidthUOM","DataType":"nvarchar","change":false},{"Name":"Depth","DataType":"nvarchar","change":false},{"Name":"DepthUOM","DataType":"nvarchar","change":false},{"Name":"Weight","DataType":"nvarchar","change":false},{"Name":"WeightUOM","DataType":"nvarchar","change":false},{"Name":"NominalVolume","DataType":"nvarchar","change":false},{"Name":"NominalVolumeUOM","DataType":"nvarchar","change":false},{"Name":"ExternalDiameter","DataType":"nvarchar","change":false},{"Name":"ExternalDiameterUOM","DataType":"nvarchar","change":false},{"Name":"Shape","DataType":"nvarchar","change":false},{"Name":"Color","DataType":"nvarchar","change":false},{"Name":"IMPrint","DataType":"nvarchar","change":false},{"Name":"Image","DataType":"nvarchar","change":false},{"Name":"VersionNo","DataType":"decimal","change":false}],"PopulationSpecifics":[{"Name":"Id","DataType":"bigint","change":false},{"Name":"ContraIndicationId","DataType":"bigint","change":false},{"Name":"TherapeuticIndicationId","DataType":"bigint","change":false},{"Name":"Age","DataType":"nvarchar","change":false},{"Name":"AgeRange","DataType":"nvarchar","change":false},{"Name":"Gender","DataType":"nvarchar","change":false},{"Name":"Race","DataType":"nvarchar","change":false},{"Name":"HealthStatus","DataType":"nvarchar","change":false},{"Name":"VersionNo","DataType":"decimal","change":false}],"ProductCrossReference":[{"Name":"Id","DataType":"bigint","change":false},{"Name":"MedicinalProductId","DataType":"bigint","change":false},{"Name":"CrossRef","DataType":"nvarchar","change":false},{"Name":"VersionNo","DataType":"decimal","change":false}],"PSURSubmission":[{"Name":"Id","DataType":"bigint","change":false},{"Name":"MarketingAuthorisationId","DataType":"bigint","change":false},{"Name":"FrequencySafetyReport","DataType":"nvarchar","change":false},{"Name":"SubmissionDate","DataType":"datetime","change":false},{"Name":"InternationalBirthDate","DataType":"datetime","change":false},{"Name":"ReferenceDate","DataType":"datetime","change":false},{"Name":"DataLockPoint","DataType":"nvarchar","change":false},{"Name":"VersionNo","DataType":"decimal","change":false}],"ReferenceStrength":[{"Name":"Id","DataType":"bigint","change":false},{"Name":"StrengthId","DataType":"bigint","change":false},{"Name":"Substance","DataType":"nvarchar","change":false},{"Name":"SpecifiedSubstance","DataType":"nvarchar","change":false},{"Name":"StrengthRange","DataType":"nvarchar","change":false},{"Name":"StrengthMeasurementPoint","DataType":"nvarchar","change":false},{"Name":"Country","DataType":"nvarchar","change":false},{"Name":"VersionNo","DataType":"decimal","change":false}],"XEVMPD":[{"Name":"VersionNumber","DataType":"int","change":false},{"Name":"ApplicationNumber","DataType":"int","change":false},{"Name":"ProceduralApprovalNumber","DataType":"int","change":false},{"Name":"Id","DataType":"int","change":false},{"Name":"ProductID","DataType":"int","change":false},{"Name":"ApprovalLiscenceNumber","DataType":"int","change":false},{"Name":"SpecialInstruction","DataType":"varchar","change":false},{"Name":"MADocumentReciptDate","DataType":"datetime","change":false},{"Name":"CreatedOn","DataType":"datetime","change":false},{"Name":"CreatedBy","DataType":"varchar","change":false},{"Name":"UpdatedOn","DataType":"datetime","change":false},{"Name":"UpdatedBy","DataType":"varchar","change":false},{"Name":"ProductName","DataType":"varchar","change":false},{"Name":"Status","DataType":"varchar","change":false},{"Name":"RegulatoryBody","DataType":"varchar","change":false},{"Name":"ProceduralApprovalDate","DataType":"datetime","change":false},{"Name":"LegalBasis","DataType":"varchar","change":false},{"Name":"ApprovalDate","DataType":"datetime","change":false},{"Name":"MAHNumber","DataType":"varchar","change":false},{"Name":"ModeOfApproval","DataType":"varchar","change":false},{"Name":"WithdrawalDate","DataType":"datetime","change":false},{"Name":"RenewalDate","DataType":"datetime","change":false},{"Name":"Country","DataType":"varchar","change":false},{"Name":"TradeName","DataType":"varchar","change":false},{"Name":"Strength","DataType":"varchar","change":false},{"Name":"PackSize","DataType":"varchar","change":false},{"Name":"DosageForm","DataType":"varchar","change":false},{"Name":"ActiveSubstance","DataType":"varchar","change":false},{"Name":"ApplicationType","DataType":"varchar","change":false},{"Name":"SubmissionType","DataType":"varchar","change":false},{"Name":"ApplicationProcedure","DataType":"varchar","change":false},{"Name":"SubCaegory","DataType":"varchar","change":false}],"LoadReference":[{"Name":"TableName","DataType":"nvarchar","change":false},{"Name":"TableInsertOrder","DataType":"int","change":false},{"Name":"ForeignKeys","DataType":"varchar","change":false},{"Name":"LookupString","DataType":"varchar","change":false},{"Name":"VersionNo","DataType":"decimal","change":false}],"RouteAdministration":[{"Name":"Id","DataType":"bigint","change":false},{"Name":"PharmaceuticalProductId","DataType":"bigint","change":false},{"Name":"RouteAdministration","DataType":"nvarchar","change":false},{"Name":"Filename","DataType":"varchar","change":false},{"Name":"VersionNo","DataType":"decimal","change":false}],"CodeDetails":[{"Name":"Code","DataType":"nvarchar","change":false},{"Name":"Value","DataType":"nvarchar","change":false},{"Name":"IsSystemDefined","DataType":"bit","change":false},{"Name":"CodeMaster_Id","DataType":"int","change":false},{"Name":"Id","DataType":"int","change":false},{"Name":"System","DataType":"nvarchar","change":false},{"Name":"MetaData","DataType":"nvarchar","change":false}],"ShelfLife":[{"Name":"Id","DataType":"bigint","change":false},{"Name":"PackagedItemId","DataType":"bigint","change":false},{"Name":"DeviceId","DataType":"bigint","change":false},{"Name":"Type","DataType":"nvarchar","change":false},{"Name":"TimePeriod","DataType":"nvarchar","change":false},{"Name":"UnitofMeasurement","DataType":"nvarchar","change":false},{"Name":"StorageSpecialPrecautions","DataType":"nvarchar","change":false},{"Name":"Filename","DataType":"varchar","change":false},{"Name":"VersionNo","DataType":"decimal","change":false}],"Strength":[{"Name":"Id","DataType":"bigint","change":false},{"Name":"SubstanceId","DataType":"bigint","change":false},{"Name":"PresentationStrengthRange","DataType":"nvarchar","change":false},{"Name":"ConcentrationStrengthRange","DataType":"nvarchar","change":false},{"Name":"MeasurementPoint","DataType":"nvarchar","change":false},{"Name":"Country","DataType":"nvarchar","change":false},{"Name":"VersionNo","DataType":"decimal","change":false}],"DataDictionary":[{"Name":"Id","DataType":"int","change":false},{"Name":"CreatedOn","DataType":"datetime","change":false},{"Name":"CreatedBy","DataType":"nvarchar","change":false},{"Name":"LastUpdatedOn","DataType":"datetime","change":false},{"Name":"LastUpdatedBy","DataType":"nvarchar","change":false},{"Name":"TableInsertOrder","DataType":"int","change":false},{"Name":"System","DataType":"nvarchar","change":false},{"Name":"Version","DataType":"decimal","change":false},{"Name":"Category","DataType":"nvarchar","change":false},{"Name":"Class","DataType":"nvarchar","change":false},{"Name":"Attribute","DataType":"nvarchar","change":false},{"Name":"Description","DataType":"nvarchar","change":false},{"Name":"TableName","DataType":"nvarchar","change":false},{"Name":"ColumnName","DataType":"nvarchar","change":false},{"Name":"Type","DataType":"nvarchar","change":false},{"Name":"ReferentialService","DataType":"xml","change":false},{"Name":"ReferentialParameters","DataType":"xml","change":false},{"Name":"ReferentialElements","DataType":"xml","change":false},{"Name":"ReferenceType","DataType":"nvarchar","change":false},{"Name":"ReferenceSections","DataType":"xml","change":false},{"Name":"ReferenceTable","DataType":"nvarchar","change":false},{"Name":"ReferenceName","DataType":"nvarchar","change":false},{"Name":"IsActive","DataType":"bit","change":false}],"Substances":[{"Name":"Id","DataType":"bigint","change":false},{"Name":"Name","DataType":"nvarchar","change":false},{"Name":"SubstanceName","DataType":"nvarchar","change":false},{"Name":"SpecifiedSubstance","DataType":"nvarchar","change":false},{"Name":"SpecifiedSubstanceGroup","DataType":"nvarchar","change":false},{"Name":"ConfidentialityIndicator","DataType":"nvarchar","change":false},{"Name":"Filename","DataType":"varchar","change":false},{"Name":"VersionNo","DataType":"decimal","change":false}],"ControlledVocabularies":[{"Name":"Id","DataType":"bigint","change":false},{"Name":"Code","DataType":"nvarchar","change":false},{"Name":"Name","DataType":"nvarchar","change":false},{"Name":"Type","DataType":"nvarchar","change":false},{"Name":"Category","DataType":"nvarchar","change":false},{"Name":"WMAcvCode","DataType":"nvarchar","change":false},{"Name":"Version","DataType":"decimal","change":false},{"Name":"CreatedOn","DataType":"datetime","change":false},{"Name":"CreatedBy","DataType":"nvarchar","change":false},{"Name":"Active","DataType":"bit","change":false}],"TherapeuticIndication":[{"Name":"Id","DataType":"bigint","change":false},{"Name":"MedicinalProductId","DataType":"bigint","change":false},{"Name":"Text","DataType":"nvarchar","change":false},{"Name":"Indication","DataType":"nvarchar","change":false},{"Name":"DiseaseStatus","DataType":"nvarchar","change":false},{"Name":"CoMorbidity","DataType":"nvarchar","change":false},{"Name":"IntendedEffect","DataType":"nvarchar","change":false},{"Name":"Timing","DataType":"nvarchar","change":false},{"Name":"Filename","DataType":"varchar","change":false},{"Name":"VersionNo","DataType":"decimal","change":false}],"IDMPModel":[{"Name":"TypeName","DataType":"nvarchar","change":false},{"Name":"is_user_defined","DataType":"bit","change":false},{"Name":"is_assembly_type","DataType":"bit","change":false},{"Name":"max_length","DataType":"smallint","change":false},{"Name":"PRECISION","DataType":"tinyint","change":false},{"Name":"scale","DataType":"tinyint","change":false},{"Name":"TableName","DataType":"nvarchar","change":false},{"Name":"ColumnName","DataType":"nvarchar","change":false},{"Name":"Category","DataType":"nvarchar","change":false}],"UndesirableEffects":[{"Name":"Id","DataType":"bigint","change":false},{"Name":"MedicinalProductId","DataType":"bigint","change":false},{"Name":"Text","DataType":"nvarchar","change":false},{"Name":"Type","DataType":"nvarchar","change":false},{"Name":"Classification","DataType":"nvarchar","change":false},{"Name":"Occurrence","DataType":"nvarchar","change":false},{"Name":"Filename","DataType":"varchar","change":false},{"Name":"VersionNo","DataType":"decimal","change":false}],"sysdiagrams":[{"Name":"name","DataType":"nvarchar","change":false},{"Name":"principal_id","DataType":"int","change":false},{"Name":"diagram_id","DataType":"int","change":false},{"Name":"version","DataType":"int","change":false},{"Name":"definition","DataType":"varbinary","change":false}],"UserSessions":[{"Name":"SessionId","DataType":"int","change":false},{"Name":"SessionGuid","DataType":"uniqueidentifier","change":false},{"Name":"UserName","DataType":"nvarchar","change":false},{"Name":"UpdatedOn","DataType":"datetime","change":false},{"Name":"DeviceId","DataType":"nvarchar","change":false},{"Name":"DeviceName","DataType":"nvarchar","change":false},{"Name":"Platform","DataType":"nvarchar","change":false},{"Name":"Version","DataType":"nvarchar","change":false},{"Name":"Location","DataType":"nvarchar","change":false},{"Name":"LoggedOn","DataType":"datetime","change":false},{"Name":"LoggedOff","DataType":"datetime","change":false}],"pr_xml_code":[{"Name":"CodeName","DataType":"varchar","change":false},{"Name":"CodeAlias","DataType":"varchar","change":false},{"Name":"CodeValue","DataType":"varchar","change":false},{"Name":"CodeOrder","DataType":"int","change":false},{"Name":"RecordStatus","DataType":"int","change":false},{"Name":"CreateDate","DataType":"datetime","change":false},{"Name":"CreateUserID","DataType":"int","change":false},{"Name":"LastActionDate","DataType":"datetime","change":false},{"Name":"LastActionUserID","DataType":"int","change":false},{"Name":"CodeID","DataType":"int","change":false},{"Name":"LabelID","DataType":"int","change":false},{"Name":"CodeGroup","DataType":"varchar","change":false},{"Name":"CodeType","DataType":"nvarchar","change":false}],"MedicinalProductName":[{"Name":"id","DataType":"bigint","change":false},{"Name":"MedicinalProductId","DataType":"bigint","change":false},{"Name":"Name","DataType":"nvarchar","change":false},{"Name":"InventedName","DataType":"nvarchar","change":false},{"Name":"ScientificName","DataType":"nvarchar","change":false},{"Name":"Strength","DataType":"nvarchar","change":false},{"Name":"DoseForm","DataType":"nvarchar","change":false},{"Name":"Formulation","DataType":"nvarchar","change":false},{"Name":"IntendedUse","DataType":"nvarchar","change":false},{"Name":"TargetPopulation","DataType":"nvarchar","change":false},{"Name":"Container","DataType":"nvarchar","change":false},{"Name":"Device","DataType":"nvarchar","change":false},{"Name":"Trademark","DataType":"nvarchar","change":false},{"Name":"Time","DataType":"nvarchar","change":false},{"Name":"Flavour","DataType":"nvarchar","change":false},{"Name":"Filename","DataType":"varchar","change":false},{"Name":"VersionNo","DataType":"decimal","change":false}],"Version":[{"Name":"Id","DataType":"bigint","change":false},{"Name":"MedicinalProductId","DataType":"bigint","change":false},{"Name":"Date","DataType":"datetime","change":false},{"Name":"Identifier","DataType":"nvarchar","change":false},{"Name":"VersionNo","DataType":"decimal","change":false}],"MarketingAuthorisation":[{"Name":"Id","DataType":"bigint","change":false},{"Name":"MedicinalProductId","DataType":"bigint","change":false},{"Name":"Country","DataType":"nvarchar","change":false},{"Name":"Number","DataType":"nvarchar","change":false},{"Name":"SupplyLegalStatus","DataType":"nvarchar","change":false},{"Name":"AuthorisationStatus","DataType":"nvarchar","change":false},{"Name":"AuthorisationDate","DataType":"datetime","change":false},{"Name":"ValidityPeriod","DataType":"nvarchar","change":false},{"Name":"Filename","DataType":"varchar","change":false},{"Name":"VersionNo","DataType":"decimal","change":false}],"Organization":[{"Name":"Id","DataType":"bigint","change":false},{"Name":"Identifier","DataType":"nvarchar","change":false},{"Name":"Name","DataType":"nvarchar","change":false},{"Name":"Address","DataType":"nvarchar","change":false},{"Name":"ConfidentialityIndicator","DataType":"nvarchar","change":false},{"Name":"Filename","DataType":"varchar","change":false},{"Name":"VersionNo","DataType":"decimal","change":false}],"RegulatedDocument":[{"Name":"Id","DataType":"bigint","change":false},{"Name":"VersionId","DataType":"bigint","change":false},{"Name":"DocumentIdentifier","DataType":"nvarchar","change":false},{"Name":"Type","DataType":"nvarchar","change":false},{"Name":"RegulatedDocument","DataType":"nvarchar","change":false},{"Name":"EffectiveDate","DataType":"datetime","change":false},{"Name":"VersionNo","DataType":"decimal","change":false}],"OtherCharacteristics":[{"Name":"Id","DataType":"bigint","change":false},{"Name":"OtherCharacteristicsCodeSystem","DataType":"nvarchar","change":false},{"Name":"OtherCharacteristicsCodeValue","DataType":"nvarchar","change":false},{"Name":"VersionNo","DataType":"decimal","change":false}],"Device":[{"Name":"Id","DataType":"bigint","change":false},{"Name":"PharmaceuticalProductId","DataType":"bigint","change":false},{"Name":"PackagedItemId","DataType":"bigint","change":false},{"Name":"OtherCharacteristicsId","DataType":"bigint","change":false},{"Name":"Type","DataType":"nvarchar","change":false},{"Name":"TradeName","DataType":"nvarchar","change":false},{"Name":"Quantity","DataType":"tinyint","change":false},{"Name":"ListingNumber","DataType":"nvarchar","change":false},{"Name":"ModelNumber","DataType":"nvarchar","change":false},{"Name":"BatchNumber","DataType":"nvarchar","change":false},{"Name":"ExpirationDate","DataType":"datetime","change":false},{"Name":"Material","DataType":"nvarchar","change":false},{"Name":"AlternateMaterial","DataType":"nvarchar","change":false},{"Name":"AllegenicityIndicator","DataType":"nvarchar","change":false},{"Name":"SterilityIndicator","DataType":"nvarchar","change":false},{"Name":"SterilisationRequirementIndicator","DataType":"nvarchar","change":false},{"Name":"Usage","DataType":"nvarchar","change":false},{"Name":"VersionNo","DataType":"decimal","change":false}],"PackagedItem":[{"Name":"Id","DataType":"bigint","change":false},{"Name":"PackagedMedicinalProductId","DataType":"bigint","change":false},{"Name":"OtherCharacteristicsId","DataType":"bigint","change":false},{"Name":"ContainerType","DataType":"nvarchar","change":false},{"Name":"Quantity","DataType":"tinyint","change":false},{"Name":"Material","DataType":"nvarchar","change":false},{"Name":"AlternateMaterial","DataType":"nvarchar","change":false},{"Name":"Filename","DataType":"varchar","change":false},{"Name":"PackagedItemParentId","DataType":"bigint","change":false},{"Name":"VersionNo","DataType":"decimal","change":false}],"BatchIdentifier":[{"Name":"Id","DataType":"bigint","change":false},{"Name":"PackagedMedicinalProductId","DataType":"bigint","change":false},{"Name":"BAID1","DataType":"nvarchar","change":false},{"Name":"BAID2","DataType":"nvarchar","change":false},{"Name":"VersionNo","DataType":"decimal","change":false}],"CODEDETAILSEN":[{"Name":"Id","DataType":"int","change":false},{"Name":"Code","DataType":"nvarchar","change":false},{"Name":"Value","DataType":"nvarchar","change":false},{"Name":"IsSystemDefined","DataType":"bit","change":false},{"Name":"CodeMaster_Id","DataType":"int","change":false},{"Name":"Language","DataType":"varchar","change":false},{"Name":"MetaData","DataType":"nvarchar","change":false}],"ContactPerson":[{"Name":"Id","DataType":"bigint","change":false},{"Name":"OrganizationId","DataType":"bigint","change":false},{"Name":"Name","DataType":"nvarchar","change":false},{"Name":"Telecom","DataType":"nvarchar","change":false},{"Name":"Role","DataType":"nvarchar","change":false},{"Name":"ConfidentialityIndicator","DataType":"nvarchar","change":false},{"Name":"Code","DataType":"int","change":false},{"Name":"Email","DataType":"nvarchar","change":false},{"Name":"VersionNo","DataType":"decimal","change":false}],"ContraIndications":[{"Name":"Id","DataType":"bigint","change":false},{"Name":"MedicinalProductId","DataType":"bigint","change":false},{"Name":"Text","DataType":"nvarchar","change":false},{"Name":"IndicationType","DataType":"nvarchar","change":false},{"Name":"DiseaseStatus","DataType":"nvarchar","change":false},{"Name":"CoMorbidity","DataType":"nvarchar","change":false},{"Name":"Filename","DataType":"varchar","change":false},{"Name":"VersionNo","DataType":"decimal","change":false}],"ManufacturedItem":[{"Name":"Id","DataType":"bigint","change":false},{"Name":"PackagedItemId","DataType":"bigint","change":false},{"Name":"OtherCharacteristicsId","DataType":"bigint","change":false},{"Name":"DoseForm","DataType":"nvarchar","change":false},{"Name":"PresentationUnit","DataType":"nvarchar","change":false},{"Name":"Quantity","DataType":"nvarchar","change":false},{"Name":"Filename","DataType":"varchar","change":false},{"Name":"VersionNo","DataType":"decimal","change":false}],"Country":[{"Name":"Id","DataType":"bigint","change":false},{"Name":"MedicinalProductNameId","DataType":"bigint","change":false},{"Name":"Country","DataType":"nvarchar","change":false},{"Name":"Jurisdiction","DataType":"nvarchar","change":false},{"Name":"Language","DataType":"nvarchar","change":false},{"Name":"VersionNo","DataType":"decimal","change":false}],"DataCarrierIdentifier":[{"Name":"Id","DataType":"bigint","change":false},{"Name":"PackagedItemId","DataType":"bigint","change":false},{"Name":"Code","DataType":"nvarchar","change":false},{"Name":"Value","DataType":"nvarchar","change":false},{"Name":"VersionNo","DataType":"decimal","change":false}],"DeviceBatchIdentification":[{"Name":"Id","DataType":"bigint","change":false},{"Name":"DeviceId","DataType":"bigint","change":false},{"Name":"BatchNumber","DataType":"nvarchar","change":false},{"Name":"ExpiryDate","DataType":"datetime","change":false},{"Name":"VersionNo","DataType":"decimal","change":false}],"DeviceNomenclature":[{"Name":"Id","DataType":"bigint","change":false},{"Name":"DeviceId","DataType":"bigint","change":false},{"Name":"Code","DataType":"nvarchar","change":false},{"Name":"Term","DataType":"nvarchar","change":false},{"Name":"VersionNo","DataType":"decimal","change":false}],"Ingredient":[{"Name":"Id","DataType":"bigint","change":false},{"Name":"SubstancesId","DataType":"bigint","change":false},{"Name":"PharmaceuticalProductId","DataType":"bigint","change":false},{"Name":"ManufacturedItemId","DataType":"bigint","change":false},{"Name":"Role","DataType":"nvarchar","change":false},{"Name":"Filename","DataType":"varchar","change":false},{"Name":"SubstanceCode","DataType":"nvarchar","change":false},{"Name":"VersionNo","DataType":"decimal","change":false}],"Interactant":[{"Name":"Id","DataType":"bigint","change":false},{"Name":"InteractionId","DataType":"bigint","change":false},{"Name":"Code","DataType":"nvarchar","change":false},{"Name":"Value","DataType":"nvarchar","change":false},{"Name":"VersionNo","DataType":"decimal","change":false}],"Interactions":[{"Name":"Id","DataType":"bigint","change":false},{"Name":"MedicinalProductId","DataType":"bigint","change":false},{"Name":"Text","DataType":"nvarchar","change":false},{"Name":"Type","DataType":"nvarchar","change":false},{"Name":"Effect","DataType":"nvarchar","change":false},{"Name":"Incidence","DataType":"nvarchar","change":false},{"Name":"ManagementActions","DataType":"nvarchar","change":false},{"Name":"VersionNo","DataType":"decimal","change":false}],"Sources_XEVMPD":[{"Name":"Id","DataType":"int","change":false},{"Name":"XEVMPDId","DataType":"int","change":false},{"Name":"CreatedOn","DataType":"datetime","change":false},{"Name":"CreatedBy","DataType":"varchar","change":false},{"Name":"UpdatedOn","DataType":"datetime","change":false},{"Name":"UpdatedBy","DataType":"varchar","change":false},{"Name":"OperationType","DataType":"varchar","change":false},{"Name":"LocalNumber","DataType":"varchar","change":false},{"Name":"Evcode","DataType":"varchar","change":false},{"Name":"SourceName","DataType":"varchar","change":false},{"Name":"Comment","DataType":"varchar","change":false}],"AuditHeader":[{"Name":"Id","DataType":"int","change":false},{"Name":"EventName","DataType":"nvarchar","change":false},{"Name":"EventSource","DataType":"nvarchar","change":false},{"Name":"UserName","DataType":"nvarchar","change":false},{"Name":"UserId","DataType":"nvarchar","change":false},{"Name":"TimeStamp","DataType":"datetime","change":false},{"Name":"SessionId","DataType":"uniqueidentifier","change":false},{"Name":"ObjectId","DataType":"nvarchar","change":false},{"Name":"ReferenceId","DataType":"int","change":false},{"Name":"ReasonCode","DataType":"nvarchar","change":false},{"Name":"ObjectType","DataType":"nvarchar","change":false}],"Organization_XEVMPD":[{"Name":"Id","DataType":"int","change":false},{"Name":"XEVMPDId","DataType":"int","change":false},{"Name":"CreatedOn","DataType":"datetime","change":false},{"Name":"CreatedBy","DataType":"varchar","change":false},{"Name":"UpdatedOn","DataType":"datetime","change":false},{"Name":"UpdatedBy","DataType":"varchar","change":false},{"Name":"Operationtype","DataType":"varchar","change":false},{"Name":"TypeOfOrganization","DataType":"varchar","change":false},{"Name":"NameOfOrganization","DataType":"varchar","change":false},{"Name":"LocalNumber","DataType":"varchar","change":false},{"Name":"Evcode","DataType":"varchar","change":false},{"Name":"OrganizationSenderID","DataType":"varchar","change":false},{"Name":"Address","DataType":"varchar","change":false},{"Name":"City","DataType":"varchar","change":false},{"Name":"State","DataType":"varchar","change":false},{"Name":"PostalCode","DataType":"varchar","change":false},{"Name":"CountryCode","DataType":"varchar","change":false},{"Name":"TelephoneNumber","DataType":"varchar","change":false},{"Name":"TelephoneEXTN","DataType":"varchar","change":false},{"Name":"TelCountryCode","DataType":"varchar","change":false},{"Name":"FaxNumber","DataType":"varchar","change":false},{"Name":"FaxEXTN","DataType":"varchar","change":false},{"Name":"FaxCountryCode","DataType":"varchar","change":false},{"Name":"Email","DataType":"varchar","change":false},{"Name":"Comments","DataType":"varchar","change":false},{"Name":"SMEStatus","DataType":"varchar","change":false},{"Name":"SMENumber","DataType":"nchar","change":false}],"Manufacturer":[{"Name":"Id","DataType":"bigint","change":false},{"Name":"MedicinalProductId","DataType":"bigint","change":false},{"Name":"DeviceId","DataType":"bigint","change":false},{"Name":"OrganizationId","DataType":"bigint","change":false},{"Name":"ManufacturingOperationId","DataType":"bigint","change":false},{"Name":"Filename","DataType":"varchar","change":false},{"Name":"VersionNo","DataType":"decimal","change":false}],"ExtractMappings":[{"Name":"Id","DataType":"int","change":false},{"Name":"Source","DataType":"nvarchar","change":false},{"Name":"IsMultiValued","DataType":"bit","change":false},{"Name":"CreatedOn","DataType":"datetime","change":false},{"Name":"SortOrder","DataType":"int","change":false},{"Name":"IsActive","DataType":"bit","change":false},{"Name":"Keywords","DataType":"nvarchar","change":false},{"Name":"CreatedBy","DataType":"nvarchar","change":false},{"Name":"LastModifiedOn","DataType":"datetime","change":false},{"Name":"LastModifiedBy","DataType":"nvarchar","change":false},{"Name":"DefaultValue","DataType":"nvarchar","change":false},{"Name":"Format","DataType":"nvarchar","change":false},{"Name":"DictionaryId","DataType":"int","change":false},{"Name":"Version","DataType":"decimal","change":false},{"Name":"Type","DataType":"nvarchar","change":false},{"Name":"Section","DataType":"nvarchar","change":false},{"Name":"Attribute","DataType":"nvarchar","change":false},{"Name":"Query","DataType":"nvarchar","change":false}],"ManufacturingOperation":[{"Name":"Id","DataType":"bigint","change":false},{"Name":"OperationType","DataType":"nvarchar","change":false},{"Name":"AuthorisationReferenceNumber","DataType":"nvarchar","change":false},{"Name":"EffectiveDate","DataType":"datetime","change":false},{"Name":"ConfidentialityIndicator","DataType":"nvarchar","change":false},{"Name":"VersionNo","DataType":"decimal","change":false}],"MFL_XEVMPD":[{"Name":"Id","DataType":"int","change":false},{"Name":"XEVMPDId","DataType":"int","change":false},{"Name":"CreatedOn","DataType":"datetime","change":false},{"Name":"CreatedBy","DataType":"varchar","change":false},{"Name":"UpdatedOn","DataType":"datetime","change":false},{"Name":"UpdatedBy","DataType":"varchar","change":false},{"Name":"MFL","DataType":"varchar","change":false},{"Name":"OperationType","DataType":"varchar","change":false},{"Name":"LocalNumber","DataType":"varchar","change":false},{"Name":"Evcode","DataType":"varchar","change":false},{"Name":"MFLCompany","DataType":"varchar","change":false},{"Name":"MFLDept","DataType":"varchar","change":false},{"Name":"MFLBuilding","DataType":"varchar","change":false},{"Name":"MFLStreet","DataType":"varchar","change":false},{"Name":"MFLCity","DataType":"varchar","change":false},{"Name":"MFLState","DataType":"varchar","change":false},{"Name":"MFLPostalCode","DataType":"varchar","change":false},{"Name":"MFLCountryCode","DataType":"varchar","change":false},{"Name":"Comments","DataType":"varchar","change":false}]};
+            //data2 = "["BigInt","Binary","Bit","Char","DateTime","Decimal","Float","Image","Int","Money","NChar","NText","NVarChar","Real","UniqueIdentifier","SmallDateTime","SmallInt","SmallMoney","Text","Timestamp","TinyInt","VarBinary","VarChar","Variant","Xml","Udt","Structured","Date","Time","DateTime2","DateTimeOffset"]";
+        $(document).ready(function() {
+            getTableList();
+            getDataType();
+            $(document).on('selectTable', onTableSelect);
+            $(document).on('deleteRow', onDeleteRow);
+            $('#confirmDelete').click(onDeleteConfirm)
+            $('#save_btn').click(saveModel);
+            $('#addColumn').click(onAddColumn);
+            
+            
+            
+        });
+        function getDataType(){
+            $.ajax({
+                url: '/PR/IDMP/CustomDataModel/GetAllSqlDBTypes',
+                contentType: "application/json",
+                type: 'GET',
+                success: function (data) {
+                    dataTypes = data;
+                }
+            });
+        }
+        function getTableList() {
+            $.ajax({
+                url: '/PR/IDMP/CustomDataModel/GetDBDetails',
+                contentType: "application/json",
+                type: 'GET',
+                success: function (data) {
+                    convertTableModel(JSON.parse(data));
+                }
+            });
+        }
+        function convertTableModel(table) {
+            console.log(table)
+            for (let i in table) {
+                var obj = {};
+                obj.tableName = i;
+                obj.column = table[i];
+                obj.column.forEach(function (e) {
+                    e.columnNameNew = false;
+                    e.dataTypeNew = false;
+                    e.changes = [];
+                    e.modified = false;
+                    e.delete = false;
+                })
+                tableList.push(obj);
+            }
+            
+            console.log(tableList);
+            renderTable();
+        }
+        function renderTable() {
+            let tableContainer = $('#table_list');
+            tableContainer.empty();
+            ht = '';
+            tableList.forEach(function (item, ind) {
+                let columnCount = 0;
+                let m = '';
+                item.column.forEach(function(col) {
+                    if (!col.delete) {
+                        columnCount++
+                    }
+                    if (col.modified) {
+                        m = 'mod';
+                    }
+                })
+                ht += '<a href="#" class="list-group-item" index="' + ind + '" onclick="$.event.trigger({type:\'selectTable\', message:this})">' + item.tableName + '<span class="badge ' + m + '">' + columnCount + '</span></a>'
+            })
+            tableContainer.append(ht);
+        }
+        function onTableSelect(e) {
+            index = e.message.getAttribute('index')
+            var p = e.message.parentNode;
+            var c = p.children;
+            for (i = 0; i < c.length; i++) {
+                
+                if (c[i].classList != undefined) {
+                    c[i].classList.remove('active');
+                }
+                    
+            }
+            e.message.classList.add('active')
+            renderColumn(index);
+        }
+        function renderColumn(i) {
+            let columnContainer = $('#column_list');
+            columnContainer.empty();
+            let ht = '';
+            $('#table_name').html(tableList[i].tableName)
+            ht += '<div class="list-group table-list">';
+            tableList[i].column.forEach(function (e, ind) {
+                if (!e.delete) {
+
+                    let m = '';
+                    if (e.modified) {
+                        m = 'mod';
+                    }
+                    ht += '<div class="list-group-item flex" style="display:flex;">';
+                    ht += '<div style="display:flex;"><input class="col-name" path="' + i + '/' + ind + '" value="' + e.Name + '" style=" border: 0; " /></div>';
+                    ht += '<select class="data-type" path="' + i + '/' + ind + '">';
+
+                    //ht += '<span class="form-control has-feedback" >X</span';
+                    dataTypes.forEach(function (d) {
+                        if (d.toLowerCase() == e.DataType)
+                            ht += '<option selected>' + d + '</option>';
+                        else
+                            ht += '<option>' + d + '</option>';
+                    })
+                    ht += '</select>'
+                    ht += '<i class="glyphicon glyphicon-trash form-control-feedback" onclick="$.event.trigger({type:\'deleteRow\', message:this})" path="' + i + '/' + ind + '"></i>';
+                    ht += '</div>'
+                }
+            });
+            ht += '</div>';
+            columnContainer.append(ht);
+           columnEvents();
+        }
+        function onAddColumn() {
+            let addColumn = $('#add_column');
+            addColumn.empty();
+            let ht = '';
+            ht += '<div class="list-group-item flex" style="display:flex;"><div style="display:flex;">';
+            ht += '<input class="col-name" style=" border: 1px solid #ccc; ">';
+            ht += '</div><select id="dd" class="data-type" style=" border: 1px solid #ccc; ">';
+            dataTypes.forEach(function (d) {
+                ht += '<option>' + d + '</option>';
+            })
+            ht += '</select>';
+            ht += '<div class="btn-xs btn-success" id="save_column">Save</div><div class="btn-xs btn-success">Clear</div>';
+            ht += '</div>';
+            addColumn.append(ht);
+            $('#save_column').click(onSaveColumn);
+        }
+        function onSaveColumn() {
+            console.log($(this).siblings().find('input').val())
+            console.log($(this).siblings().find('#dd').val())
+        }
+        function columnEvents() {
+            
+            $('.col-name').on('change', function () {
+                let x = $(this)[0].getAttribute('path').split('/');
+                let col = tableList[x[0]].column[x[1]];
+                $(this)[0].style.border = '1px solid orange';
+                if (col.Name != $(this)[0].value || col.Name != columnNameNew) {
+                    col.columnNameNew = $(this)[0].value;
+                    col.modified = true;
+                }
+                
+
+                renderTable();
+                //$(this).parent().find('span').removeClass('hide');
+            })
+            $('.data-type').change(function () {
+                let x = $(this)[0].getAttribute('path').split('/');
+                let col = tableList[x[0]].column[x[1]];
+                $(this)[0].style.border = '1px solid orange';
+                if (col.DataType != $(this)[0].value || col.DataType != dataTypeNew) {
+                    col.dataTypeNew = $(this)[0].value;
+                    col.modified = true;
+                }
+
+                renderTable();
+            })
+            $('.save-changes').click(function () {
+
+                let x = $(this)[0].getAttribute('path').split('/');
+
+                let col = tableList[x[0]].column[x[1]];
+                $(this)[0].previousSibling.style.border = '1px solid orange';
+                col.COLUMN_NAME = $(this)[0].previousSibling.value;
+                col.modified = true;
+                $(this).addClass('hide')
+
+
+                renderTable();
+            })
+            
+        }
+        var deleteRecord = '';
+
+        function onDeleteRow(e) {
+            $('#myModal').modal('show');
+            deleteRecord = e.message;           
+        }
+        function onDeleteConfirm() {
+            let x = deleteRecord.getAttribute('path').split('/');
+            let col = tableList[x[0]].column[x[1]];
+            col.delete = true;
+            col.modified = true;
+            deleteRecord.parentElement.style.display = 'none';
+            renderTable();
+
+        }
+        function groupBy(xs, key) {
+            return xs.reduce(function (rv, x) {
+                (rv[x[key]] = rv[x[key]] || []).push(x);
+                return rv;
+            }, {});
+        };
+        //groupBy(outJSON, 'team')
+        
+        function saveModel() {
+            let finalModel = []
+            let c = []
+            tableList.forEach(function (table) {
+                table.column.forEach(function (col) {
+                    if (col.modified) {
+                        col.tableName = table.tableName;
+                        finalModel.push(col);
+                        //col.modified = false;
+                    }
+
+                })
+            })
+            renderTable();
+            console.log(finalModel);
+            finalModel =  groupBy(finalModel, 'tableName')
+            //finalModel = '[{"Table":"MarketingAuthorisationHolder","Columns":[{"Name":"Id","DataType":"Int","Changes":[{"ChangeType":"DataType","OldValue":"Int","NewValue":"bigint"},{"ChangeType":"ColumnName","OldValue":"Id","NewValue":"OrganizationId1"}]},{"Name":"OrganizationId","DataType":"bigint","Changes":[{"ChangeType":"ColumnName","OldValue":"OrganizationId","NewValue":"OrganizationId1"}]}]}]';
+
+            //$.ajax({
+            //    url: '/PR/IDMP/CustomDataModel/SaveDBDetails',
+            //    contentType: "application/json",
+            //    data:JSON.stringify(finalModel),
+            //    type: 'POST',
+            //    success: function (data) {
+            //        console.log(data);
+            //    }
+            //});
+            
+        }
+        
+    //})();
+</script>
