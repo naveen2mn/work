@@ -82,8 +82,8 @@
                             <p class="modal-msg">Are you want to remove this Column?</p>
                         </div>
                         <div class="modal-footer">
-                            <button type="button button1" class="btn-danger"  data-dismiss="modal" id="confirmDelete">Yes</button>
-                            <button type="button button2" class="btn-warning" data-dismiss="modal">No</button>
+                            <button type="button" class="btn-danger button1"  data-dismiss="modal" id="confirmDelete">Yes</button>
+                            <button type="button" class="btn-warning button2" data-dismiss="modal">No</button>
                         </div>
                     </div>
                 </div>
@@ -251,15 +251,6 @@
                 }
                 renderTable();
             })
-            $('.save-changes').click(function () {
-                let x = $(this)[0].getAttribute('path').split('/');
-                let col = tableList[x[0]].column[x[1]];
-                $(this)[0].previousSibling.style.border = '1px solid orange';
-                col.COLUMN_NAME = $(this)[0].previousSibling.value;
-                col.modified = true;
-                $(this).addClass('hide')
-                renderTable();
-            })  
         }
        
         function onDeleteRow(e) {
@@ -267,7 +258,7 @@
             $('.modal-title').html('Remove Column?');
             $('.modal-msg').html('Are you want to remove this column?');
             $('.button1').html('Yes');
-            $('.button2').html('No');
+            $('.button2').html('No').removeClass('hide');
             deleteRecord = e.message.getAttribute('path');           
         }
         function onDeleteConfirm() {
@@ -283,19 +274,30 @@
             let ht = '';
             ht += '<div class="list-group-item flex" style="display:flex;"><div style="display:flex;">';
             ht += '<input class="col-name" style=" border: 1px solid #ccc; ">';
-            ht += '</div><select id="dd" class="data-type" style=" border: 1px solid #ccc; ">';
+            ht += '<select id="dd" class="data-type" style=" border: 1px solid #ccc; ">';
             dataTypes.forEach(function (d) {
                 ht += '<option>' + d + '</option>';
             })
             ht += '</select>';
             ht += '<div class="btn-xs btn-success" id="save_column">Save</div><div class="btn-xs btn-success">Clear</div>';
-            ht += '</div>';
+            ht += '</div></div>';
             addColumn.append(ht);
             $('#save_column').click(onSaveColumn);
         }
         function onSaveColumn() {
-            console.log($(this).siblings().find('input').val())
-            console.log($(this).siblings().find('#dd').val())
+            
+            
+
+let obj = {};
+            obj.Name = $(this).parent().find('input').val();
+            obj.DataType = $(this).parent().find('select').val().toLowerCase();
+            obj.changes = [];
+               obj.modified = false;
+                    obj.delete = false;
+                    obj.columnName = obj.Name;
+                    tableList[selectedTable].Columns.push(obj);
+                    $('#add_column').addClass('hide')
+                    renderTable();
         }     
         function saveModel() {
             let finalModel = [];
@@ -311,14 +313,19 @@
                     }
                    
                 })
-                 let obj={};
+
+                let obj={};
                 if(cl.length >0){
-                    obj.Table = item.Table;
+                   obj.Table = item.Table;
                    obj.Columns =cl;
-                    
                     finalModel.push(obj)
                 }
             })
+            $('#myModal').modal('show');
+            $('.modal-title').html('Success');
+            $('.modal-msg').html('Data has been saved successfuly...!');
+            $('#myModal .button1').html('Ok').removeClass('btn-danger');
+            $('#myModal .button2').addClass('hide');
             renderTable();
             console.log(finalModel);
             
