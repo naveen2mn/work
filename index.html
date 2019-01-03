@@ -6,14 +6,38 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="css/bootstrap.css" rel="stylesheet">
     <style>
+    .table-list {
+        height: 400px;
+        overflow: auto
+    }
     .inner-box-header{
         padding: 10px;
     }
+
+
         .form-control-feedback {
             cursor:pointer;
             pointer-events:visible;
+            opacity: 0.3;
         }
-        
+        .form-control-feedback:hover {
+            opacity:1;
+            color: red;
+        }
+        #addColumn{
+            padding:2px;
+            cursor: pointer;
+        }
+        #addColumn:hover{
+            /*color: green;*/
+        }
+        .rem-col{
+               font-size: 16px;
+    padding: 6px 2px;
+            }
+            button[disabled]{
+                opacity: 0.3;
+            }
         .mod{
             background: #d5bb63;
         }
@@ -76,14 +100,30 @@
                     <div class="modal-content">
                         <div class="modal-header">
                             <button type="button" class="close" data-dismiss="modal">&times;</button>
-                            <h4 class="modal-title">Delete?</h4>
+                            <h4 class="modal-title">Remove Column?</h4>
                         </div>
                         <div class="modal-body" style="text-align:center;">            
                             <p class="modal-msg">Are you want to remove this Column?</p>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn-danger button1"  data-dismiss="modal" id="confirmDelete">Yes</button>
-                            <button type="button" class="btn-warning button2" data-dismiss="modal">No</button>
+                            <button type="button" class="btn-danger"  data-dismiss="modal" id="confirmDelete">Yes</button>
+                            <button type="button" class="btn-warning" data-dismiss="modal">No</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal fade" id="sModal" role="dialog">
+                <div class="modal-dialog modal-sm">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <h4 class="modal-title">Success</h4>
+                        </div>
+                        <div class="modal-body" style="text-align:center;">            
+                            <p class="modal-msg">Changes has been saved successfuly...!</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn-primary"  data-dismiss="modal" id="confirmDelete">Ok</button>
                         </div>
                     </div>
                 </div>
@@ -111,10 +151,6 @@
             $(document).on('deleteRow', onDeleteRow);
             $('#confirmDelete').click(onDeleteConfirm)
             $('#save_btn').click(saveModel);
-            $('#addColumn').click(onAddColumn);
-            
-            
-            
         });
         function getTableList() {
 			/*
@@ -251,14 +287,11 @@
                 }
                 renderTable();
             })
+            $('#addColumn').on('click',onAddColumn);
         }
        
         function onDeleteRow(e) {
             $('#myModal').modal('show');
-            $('.modal-title').html('Remove Column?');
-            $('.modal-msg').html('Are you want to remove this column?');
-            $('.button1').html('Yes');
-            $('.button2').html('No').removeClass('hide');
             deleteRecord = e.message.getAttribute('path');           
         }
         function onDeleteConfirm() {
@@ -269,35 +302,50 @@
             renderTable();
         }
         function onAddColumn() {
+            $('#addColumn').off('click',onAddColumn);
             let addColumn = $('#add_column');
             addColumn.empty();
             let ht = '';
-            ht += '<div class="list-group-item flex" style="display:flex;"><div style="display:flex;">';
-            ht += '<input class="col-name" style=" border: 1px solid #ccc; ">';
+            ht += '<div class="list-group-item flex" style="display:flex;justify-content:space-between"><div style="display:flex;">';
+            ht += '<input id="tb" class="col-name" style=" border: 1px solid #ccc; ">';
             ht += '<select id="dd" class="data-type" style=" border: 1px solid #ccc; ">';
             dataTypes.forEach(function (d) {
                 ht += '<option>' + d + '</option>';
             })
-            ht += '</select>';
-            ht += '<div class="btn-xs btn-success" id="save_column">Save</div><div class="btn-xs btn-success">Clear</div>';
+            ht += '</select></div><div>';
+            ht += '<i class="glyphicon glyphicon-remove rem-col pull-right"></i>';
+            ht += '<button type="button" class="btn-primary btn-xs pull-right" disabled style=" margin: 2px; " id="save_column">Add</button>';
             ht += '</div></div>';
+            
             addColumn.append(ht);
             $('#save_column').click(onSaveColumn);
+            $('#tb').keyup(function(){
+                if($('#tb').val()){
+                    $('#save_column').prop('disabled', false);
+                }
+                else{
+                    $('#save_column').prop('disabled', true);
+                }
+                
+            })
+            $('.rem-col').click(function(){
+                $('#add_column').empty();
+                renderTable()
+            });
         }
         function onSaveColumn() {
-            
-            
-
-let obj = {};
-            obj.Name = $(this).parent().find('input').val();
-            obj.DataType = $(this).parent().find('select').val().toLowerCase();
+            if($('#tb').val() != "" || $('#tb').val() != undefined){          
+            let obj = {};
+            obj.Name = $('#tb').val();
+            obj.DataType = $('#dd').val().toLowerCase();
             obj.changes = [];
                obj.modified = false;
                     obj.delete = false;
                     obj.columnName = obj.Name;
                     tableList[selectedTable].Columns.push(obj);
-                    $('#add_column').addClass('hide')
+                    $('#add_column').empty();
                     renderTable();
+            }
         }     
         function saveModel() {
             let finalModel = [];
@@ -321,11 +369,8 @@ let obj = {};
                     finalModel.push(obj)
                 }
             })
-            $('#myModal').modal('show');
-            $('.modal-title').html('Success');
-            $('.modal-msg').html('Data has been saved successfuly...!');
-            $('#myModal .button1').html('Ok').removeClass('btn-danger');
-            $('#myModal .button2').addClass('hide');
+            $('#sModal').modal('show');
+            
             renderTable();
             console.log(finalModel);
             
