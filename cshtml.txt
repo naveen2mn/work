@@ -11,11 +11,10 @@
         min-height: 30px;
     }
 
-    .table-list {
+   .table-list {
         overflow-y: auto;
         height: 550px;
     }
-
     .form-control-feedback {
         cursor: pointer;
         pointer-events: visible;
