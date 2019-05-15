@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Bootstrap Example</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="css/bootstrap.min.css">
+
+  <style>
+  </style>
+  
+</head>
+<body>
+<div class="container">
+	<div id="view"></div>
+</div>
+
+  <script src="js/jquery.min.js"></script>
+  <script src="js/bootstrap.min.js"></script>
+  <script>
+	$(document).ready(function(){
+		data = { "StudyName": "One Clinical", "TheraupeticArea":"Test", "StudyDescription":"Test", "StartDate": "04/12/2019", "Delay": { "SiteSelection": 2, "SiteActivation":5 }, "MaximumAllowableTime": { "SiteSelection": 5, "SiteActivation": 7 }, "MaxEnrolledPatientsPerSite":100, "NumOfVisits":6, "ScreenFailRate":100, "ScreenDuration":100, "TotalCompletedPatients":100, "NumOfSimulations":100, "CountryData":[ { "CountryName":"India", "NumOfSites":2, "Type":"lognormal", "Mode":9, "TailProbability":0.95, "Tail":6 }, { "CountryName":"France", "NumOfSites":1, "Type":"lognormal", "Mode":9, "TailProbability":0.95, "Tail":6 } ], "SiteSelectionData": { "Type": "lognormal", "Mode": 9, "TailProbability":0.95, "Tail":6 }, "SiteData":[ { "CountryName":"India", "SiteName":"Chennai", "PatientsPerCycle":3, "ActivationEnrollmentDelay":1 }, { "CountryName":"India", "SiteName":"Madurai", "PatientsPerCycle":3, "ActivationEnrollmentDelay":1 }, { "CountryName":"India", "SiteName":"Trichy", "PatientsPerCycle":2, "ActivationEnrollmentDelay":2 } ], "PatientVisitData":[ { "Visit":1, "InterVisitGap":1, "DropRate":0.1, "VisitProbabilityOfUnscheduled":0.1 }, { "Visit":2, "InterVisitGap":1, "DropRate":0.1, "VisitProbabilityOfUnscheduled":0.1 }, { "Visit":3, "InterVisitGap":1, "DropRate":0.1, "VisitProbabilityOfUnscheduled":0.1 }, { "Visit":4, "InterVisitGap":1, "DropRate":0.1, "VisitProbabilityOfUnscheduled":0.1 }, { "Visit":5, "InterVisitGap":1, "DropRate":0.1, "VisitProbabilityOfUnscheduled":0.1 }, { "Visit":5, "InterVisitGap":1, "DropRate":0.1, "VisitProbabilityOfUnscheduled":0.1 } ] }
+		render(data);	
+	});
+	function render(data){
+		var viewContainer=$('#view').empty();
+		var html ="";
+		
+		html='<div>'+data.StudyName+'</div>';
+		
+		viewContainer.append(html);
+	}
+  </script>
+</body>
+</html>
+
+
+
